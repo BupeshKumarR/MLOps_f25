@@ -1,8 +1,9 @@
-name: Periodic Model Calibration
+name: Model Retraining on Push to Main
 
-on: 
-  schedule:
-    - cron: '0 0 * * *'  #minutes, hours, day, month, day of week 
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch
 
 jobs:
   retrain:
@@ -10,10 +11,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.9
 
@@ -32,7 +33,7 @@ jobs:
 
     - name: Set File Permissions
       run: |
-        chmod +x ./src/train_model.py
+        chmod +x ./src/train_model.py #making it executable
 
     - name: Retrain Model
       run: |
@@ -44,24 +45,28 @@ jobs:
         timestamp=$(cat timestamp.txt) # Use the timestamp in your training script
         python ./src/evaluate_model.py  --timestamp "$timestamp" # Assuming you have a script for model evaluation
         metrics_filename="${timestamp}_metrics.json"
-        mv $metrics_filename $GITHUB_WORKSPACE/metrics/$metrics_filename
+        if [ -f "$metrics_filename" ]; then
+          mv "$metrics_filename" ./metrics/
+        fi
       continue-on-error: false  # Continue even if evaluation fails
 
     - name: Store and Version the New Model
       run: |
         timestamp=$(cat timestamp.txt)
         model_filename="model_${timestamp}_dt_model.joblib"
-        mv $model_filename $GITHUB_WORKSPACE/models/$model_filename
+        if [ -f "$model_filename" ]; then
+          mv "$model_filename" ./models/
+        fi
 
     - name: Commit and Push Changes
       run: |
-        git config --global user.email "26876927+raminmohammadi@users.noreply.github.com"
-        git config --global user.name "raminmohammadi"
-        git add $GITHUB_WORKSPACE/metrics/$metrics_filename $GITHUB_WORKSPACE/models/$model_filename
-        git commit -m "Add metrics and updated model"
+        timestamp=$(cat timestamp.txt)
+        metrics_filename="${timestamp}_metrics.json"
+        model_filename="model_${timestamp}_dt_model.joblib"
+        git config --global user.email "rbupeshkumar@gmail.com"
+        git config --global user.name "BupeshKumarR"
+        git add metrics/$metrics_filename models/$model_filename
+        git commit -m "Add metrics and updated model [timestamp: $timestamp]"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
-
