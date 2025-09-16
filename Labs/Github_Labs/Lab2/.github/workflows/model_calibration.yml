@@ -33,6 +33,12 @@ jobs:
     - name: Set File Permissions
       run: |
         chmod +x ./src/train_model.py
+        
+    - name: Ensure Directories Exist
+      run: |
+        mkdir -p Labs/Github_Labs/Lab2/metrics
+        mkdir -p Labs/Github_Labs/Lab2/models
+        mkdir -p Labs/Github_Labs/Lab2/data
 
     - name: Retrain Model
       run: |
