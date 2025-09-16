@@ -34,12 +34,19 @@ if __name__ == '__main__':
                             random_state=0,
                             shuffle=True,
                         )
-    data_dir = os.path.join(os.getcwd(), 'Labs', 'Github_Labs', 'Lab2', 'data')
-    os.makedirs(data_dir, exist_ok=True)
-    with open(os.path.join(data_dir, 'data.pickle'), 'wb') as data:
-        pickle.dump(X, data)
-    with open(os.path.join(data_dir, 'target.pickle'), 'wb') as data:
-        pickle.dump(y, data)  
+    if os.path.exists('data'): 
+        with open('data/data.pickle', 'wb') as data:
+            pickle.dump(X, data)
+            
+        with open('data/target.pickle', 'wb') as data:
+            pickle.dump(y, data)  
+    else:
+        os.makedirs('data/')
+        with open('data/data.pickle', 'wb') as data:
+            pickle.dump(X, data)
+            
+        with open('data/target.pickle', 'wb') as data:
+            pickle.dump(y, data)  
             
     mlflow.set_tracking_uri("./mlruns")
     dataset_name = "Reuters Corpus Volume"
@@ -65,11 +72,12 @@ if __name__ == '__main__':
         mlflow.log_metrics({'Accuracy': accuracy_score(y, y_predict),
                             'F1 Score': f1_score(y, y_predict)})
         
-        models_dir = os.path.join(os.getcwd(), 'Labs', 'Github_Labs', 'Lab2', 'models')
-        os.makedirs(models_dir, exist_ok=True)
-        
-        model_version = f'model_{timestamp}'
+        if not os.path.exists('models/'): 
+            # then create it.
+            os.makedirs("models/")
+            
+        # After retraining the model
+        model_version = f'model_{timestamp}'  # Use a timestamp as the version
         model_filename = f'{model_version}_dt_model.joblib'
-        dump(forest, os.path.join(models_dir, model_filename))
+        dump(forest, model_filename)
                     
-

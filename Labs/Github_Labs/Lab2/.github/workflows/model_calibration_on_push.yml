@@ -35,12 +35,6 @@ jobs:
       run: |
         chmod +x ./src/train_model.py #making it executable
 
-    - name: Ensure Directories Exist
-      run: |
-        mkdir -p Labs/Github_Labs/Lab2/metrics
-        mkdir -p Labs/Github_Labs/Lab2/models
-        mkdir -p Labs/Github_Labs/Lab2/data
-
     - name: Retrain Model
       run: |
         timestamp=$(cat timestamp.txt) # Use the timestamp in your training script
@@ -48,27 +42,24 @@ jobs:
 
     - name: Evaluate Model and Log Metrics
       run: |
-        timestamp=$(cat timestamp.txt)
-        python Labs/Github_Labs/Lab2/src/evaluate_model.py --timestamp "$timestamp"
-      continue-on-error: false
+        timestamp=$(cat timestamp.txt) # Use the timestamp in your training script
+        python ./src/evaluate_model.py  --timestamp "$timestamp" # Assuming you have a script for model evaluation
+        metrics_filename="${timestamp}_metrics.json"
+        mv $metrics_filename $GITHUB_WORKSPACE/metrics/$metrics_filename
+      continue-on-error: false  # Continue even if evaluation fails
 
     - name: Store and Version the New Model
       run: |
         timestamp=$(cat timestamp.txt)
-        python Labs/Github_Labs/Lab2/src/train_model.py --timestamp "$timestamp"
+        model_filename="model_${timestamp}_dt_model.joblib"
+        mv $model_filename $GITHUB_WORKSPACE/models/$model_filename
 
     - name: Commit and Push Changes
       run: |
-        timestamp=$(cat timestamp.txt)
-        metrics_filename="${timestamp}_metrics.json"
-        model_filename="model_${timestamp}_dt_model.joblib"
         git config --global user.email "26876927+raminmohammadi@users.noreply.github.com"
         git config --global user.name "raminmohammadi"
-        
-        git add Labs/Github_Labs/Lab2/metrics/"$metrics_filename" Labs/Github_Labs/Lab2/models/"$model_filename"
-        
-        git commit -m "Add metrics and updated model [timestamp: $timestamp]"
+        git add $GITHUB_WORKSPACE/metrics/$metrics_filename $GITHUB_WORKSPACE/models/$model_filename
+        git commit -m "Add metrics and updated model"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
