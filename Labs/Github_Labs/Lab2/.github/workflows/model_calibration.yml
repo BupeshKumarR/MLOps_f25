@@ -48,11 +48,15 @@ jobs:
     - name: Evaluate Model and Log Metrics
       run: |
         timestamp=$(cat timestamp.txt)
-        python Labs/Github_Labs/Lab2/src/evaluate_model.py --timestamp "$timestamp"
+        # Change into the correct directory for the script to run properly
+        cd Labs/Github_Labs/Lab2/src
+        python evaluate_model.py --timestamp "$timestamp"
+        
+        # Move the file from the src directory to the metrics directory
         metrics_filename="${timestamp}_metrics.json"
-        mkdir -p Labs/Github_Labs/Lab2/metrics
+        mkdir -p ../metrics # Ensure the metrics directory exists
         if [ -f "$metrics_filename" ]; then
-          mv "$metrics_filename" Labs/Github_Labs/Lab2/metrics/
+          mv "$metrics_filename" ../metrics/
         fi
       continue-on-error: false
 
