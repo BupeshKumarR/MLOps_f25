@@ -63,8 +63,8 @@ jobs:
         timestamp=$(cat timestamp.txt)
         metrics_filename="${timestamp}_metrics.json"
         model_filename="model_${timestamp}_dt_model.joblib"
-        git config --global user.email "rbupeshkumar@gmail.com"
-        git config --global user.name "BupeshKumarR"
+        git config --global user.email "26876927+raminmohammadi@users.noreply.github.com"
+        git config --global user.name "raminmohammadi"
         git add metrics/$metrics_filename models/$model_filename
         git commit -m "Add metrics and updated model [timestamp: $timestamp]"
         git push
