@@ -49,28 +49,25 @@ jobs:
       run: |
         timestamp=$(cat timestamp.txt)
         python Labs/Github_Labs/Lab2/src/evaluate_model.py --timestamp "$timestamp"
-        metrics_filename="${timestamp}_metrics.json"
-        mkdir -p Labs/Github_Labs/Lab2/metrics
-        if [ -f "$metrics_filename" ]; then
-          mv "$metrics_filename" Labs/Github_Labs/Lab2/metrics/
-        fi
       continue-on-error: false
 
     - name: Store and Version the New Model
       run: |
         timestamp=$(cat timestamp.txt)
-        model_filename="model_${timestamp}_dt_model.joblib"
-        mkdir -p Labs/Github_Labs/Lab2/models
-        if [ -f "$model_filename" ]; then
-          mv "$model_filename" Labs/Github_Labs/Lab2/models/
-        fi
+        python Labs/Github_Labs/Lab2/src/train_model.py --timestamp "$timestamp"
 
     - name: Commit and Push Changes
       run: |
+        timestamp=$(cat timestamp.txt)
+        metrics_filename="${timestamp}_metrics.json"
+        model_filename="model_${timestamp}_dt_model.joblib"
         git config --global user.email "26876927+raminmohammadi@users.noreply.github.com"
         git config --global user.name "raminmohammadi"
-        git add $GITHUB_WORKSPACE/metrics/$metrics_filename $GITHUB_WORKSPACE/models/$model_filename
-        git commit -m "Add metrics and updated model"
+        
+        # Correct git add paths
+        git add Labs/Github_Labs/Lab2/metrics/$metrics_filename Labs/Github_Labs/Lab2/models/$model_filename
+        
+        git commit -m "Add metrics and updated model [timestamp: $timestamp]"
         git push
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
