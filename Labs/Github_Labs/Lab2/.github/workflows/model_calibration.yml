@@ -33,7 +33,7 @@ jobs:
     - name: Set File Permissions
       run: |
         chmod +x ./src/train_model.py
-        
+
     - name: Ensure Directories Exist
       run: |
         mkdir -p Labs/Github_Labs/Lab2/metrics
@@ -47,17 +47,23 @@ jobs:
 
     - name: Evaluate Model and Log Metrics
       run: |
-        timestamp=$(cat timestamp.txt) # Use the timestamp in your training script
-        python ./src/evaluate_model.py  --timestamp "$timestamp" # Assuming you have a script for model evaluation
+        timestamp=$(cat timestamp.txt)
+        python Labs/Github_Labs/Lab2/src/evaluate_model.py --timestamp "$timestamp"
         metrics_filename="${timestamp}_metrics.json"
-        mv $metrics_filename $GITHUB_WORKSPACE/metrics/$metrics_filename
-      continue-on-error: false  # Continue even if evaluation fails
+        mkdir -p Labs/Github_Labs/Lab2/metrics
+        if [ -f "$metrics_filename" ]; then
+          mv "$metrics_filename" Labs/Github_Labs/Lab2/metrics/
+        fi
+      continue-on-error: false
 
     - name: Store and Version the New Model
       run: |
         timestamp=$(cat timestamp.txt)
         model_filename="model_${timestamp}_dt_model.joblib"
-        mv $model_filename $GITHUB_WORKSPACE/models/$model_filename
+        mkdir -p Labs/Github_Labs/Lab2/models
+        if [ -f "$model_filename" ]; then
+          mv "$model_filename" Labs/Github_Labs/Lab2/models/
+        fi
 
     - name: Commit and Push Changes
       run: |
