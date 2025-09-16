@@ -63,9 +63,8 @@ jobs:
         model_filename="model_${timestamp}_dt_model.joblib"
         git config --global user.email "26876927+raminmohammadi@users.noreply.github.com"
         git config --global user.name "raminmohammadi"
-        
-        # Correct git add paths
-        git add Labs/Github_Labs/Lab2/metrics/$metrics_filename Labs/Github_Labs/Lab2/models/$model_filename
+
+        git add Labs/Github_Labs/Lab2/metrics/"$metrics_filename" Labs/Github_Labs/Lab2/models/"$model_filename"
         
         git commit -m "Add metrics and updated model [timestamp: $timestamp]"
         git push
