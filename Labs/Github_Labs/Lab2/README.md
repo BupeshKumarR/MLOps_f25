@@ -17,7 +17,7 @@ Watch the tutorial video for this lab at [Github action Lab2](https://youtu.be/c
 3. **Clone Your Repository**:
    ```bash
    git clone https://github.com/your-username/your-forked-repo.git
-   cd your-forked-repo
+   cd your-forked-repo-lab
 
    ```
 4. GitHub account
